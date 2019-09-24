@@ -32,8 +32,10 @@ namespace 'docker' do
     ['AWS_REGION', 'S3_BUCKET', 'S3_DIR'].each do |env_name|
       env_file.write("#{env_name}=#{ENV[env_name]}\n")
     end
-    sh 'docker build -t aws/openvpn:base -f docker/base/Dockerfile --pull .'
     env_file.close
+    #ONBUILD will execute build actually when you refer the image using from in dockerfile, it means next build will take action all dockerfile content in base
+    #so we need unnested build command out of the loop, because i have omit the ONBUILD from base's dockerfile
+    sh 'docker build -t aws/openvpn:base -f docker/base/Dockerfile --pull .'
   end
 
   desc 'Build the awssdk container'
@@ -113,4 +115,7 @@ namespace :spec do
 end
 
 desc 'Does all needed steps to deploy to aws'
-task :deploy_aws => ['docker:build_latest', 'spec:openvpn', 'docker:tag_aws', 'docker:push_aws']
+#task :deploy_aws => ['force_build_gets3files']
+task :deploy_aws => ['docker:build_latest']
+#task :deploy_aws => ['spec:openvpn']
+#task :deploy_aws => ['docker:tag_aws', 'docker:push_aws']

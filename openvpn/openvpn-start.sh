@@ -8,5 +8,8 @@ chmod 0640 $files
 chgrp nogroup $files
 cp -p crl.pem jail
 chown nobody:nogroup ipp.txt
+mkdir -p /dev/net
+if [ ! -c /dev/net/tun ]; then mknod /dev/net/tun c 10 200; fi
+
 
 exec openvpn $*

@@ -43,3 +43,151 @@ download a file, but failing due to not having sufficient aws credentials.
 ## AWS command to get temporary credentials for Amazon Container Service
 
 `aws ecr get-login`
+
+and execute the displayed command locally, and it will add the credential to ~/.docker/config.json
+
+## Misc.
+
+if you want to run docker container with tun device, it needs to activate in parameter --cap-add=NET_ADMIN or --priviledged
+and the latter one is insecure and not recommended, only for testing purpose
+
+## activating the docker locally
+
+docker run -p 35000:443/tcp -it --entrypoint=sh --cap-add=NET_ADMIN aws/openvpn:tcp
+./openvpn-start.sh --cd /etc/openvpn --script-security 2 --config /etc/openvpn/server-tcp.conf
+on debug console prompt
+
+## aws ecs fargate configuration
+`{
+    "ipcMode": null,
+    "executionRoleArn": "arn:aws:iam:: account_id:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "dnsSearchDomains": null,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "secretOptions": null,
+                "options": {
+                    "awslogs-group": "/ecs/ovpn2",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "entryPoint": [
+                "/etc/openvpn/openvpn-start.sh"
+            ],
+            "portMappings": [
+                {
+                    "hostPort": 443,
+                    "protocol": "tcp",
+                    "containerPort": 443
+                },
+                {
+                    "hostPort": 80,
+                    "protocol": "tcp",
+                    "containerPort": 80
+                }
+            ],
+            "command": [
+                "--cd",
+                "/etc/openvpn",
+                "--script-security",
+                "2",
+                "--log",
+                "/var/log/openvpn-tcp-server.log",
+                "--config",
+                "/etc/openvpn/server-tcp.conf"
+            ],
+            "linuxParameters": {
+      "capabilities": {
+        "add": ["NET_ADMIN"],
+        "drop": []
+        }
+      },
+            "cpu": 0,
+            "environment": [],
+            "resourceRequirements": null,
+            "ulimits": null,
+            "dnsServers": null,
+            "mountPoints": [],
+            "workingDirectory": "/etc/openvpn",
+            "secrets": null,
+            "dockerSecurityOptions": null,
+            "memory": null,
+            "memoryReservation": null,
+            "volumesFrom": [],
+            "stopTimeout": null,
+            "image": " account_id.dkr.ecr.us-east-1.amazonaws.com/aws/openvpn:tcp",
+            "startTimeout": null,
+            "dependsOn": null,
+            "disableNetworking": null,
+            "interactive": null,
+            "healthCheck": null,
+            "essential": true,
+            "links": null,
+            "hostname": null,
+            "extraHosts": null,
+            "pseudoTerminal": null,
+            "user": null,
+            "readonlyRootFilesystem": null,
+            "dockerLabels": null,
+            "systemControls": null,
+            "privileged": null,
+            "name": "ovpn2"
+        }
+    ],
+    "memory": "512",
+    "taskRoleArn": "arn:aws:iam:: account_id:role/ecsTaskExecutionRole",
+    "family": "ovpn2",
+    "pidMode": null,
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "networkMode": "awsvpc",
+    "cpu": "256",
+    "inferenceAccelerators": [],
+    "proxyConfiguration": null,
+    "volumes": [],
+    "tags": []
+}`
+
+it need to assign the S3FullAccess policy to ecsTaskExecutionRole
+
+
+##openvpn profile template for client
+
+`client
+proto tcp
+remote hostname
+port 35000
+dev tun
+nobind
+cipher AES-128-CBC
+auth SHA256
+key-direction 1
+comp-lzo
+
+<ca>
+-----BEGIN CERTIFICATE-----
+...
+-----END CERTIFICATE-----
+</ca>
+
+<cert>
+-----BEGIN CERTIFICATE-----
+...
+-----END CERTIFICATE-----
+</cert>
+
+<key>
+-----BEGIN PRIVATE KEY-----
+...
+-----END PRIVATE KEY-----
+</key>
+
+<tls-auth>
+-----BEGIN OpenVPN Static key V1-----
+...
+-----END OpenVPN Static key V1-----
+</tls-auth>
+`

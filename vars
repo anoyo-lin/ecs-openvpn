@@ -1,0 +1,5 @@
+export AWS_ID="account_id"
+export AWS_REGION="us-east-1"
+export S3_BUCKET="bucket_name"
+export S3_DIR="/credentials/"
+
