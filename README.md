@@ -150,9 +150,7 @@ on debug console prompt
     "volumes": [],
     "tags": []
 }`
-
-it need to assign the S3FullAccess policy to ecsTaskExecutionRole
-
+it need to assign the S3FullAccess policy to ecsTaskExecutionRole.
 
 ##openvpn profile template for client
 
@@ -166,31 +164,27 @@ cipher AES-128-CBC
 auth SHA256
 key-direction 1
 comp-lzo
-
 <ca>
 -----BEGIN CERTIFICATE-----
 ...
 -----END CERTIFICATE-----
 </ca>
-
 <cert>
 -----BEGIN CERTIFICATE-----
 ...
 -----END CERTIFICATE-----
 </cert>
-
 <key>
 -----BEGIN PRIVATE KEY-----
 ...
 -----END PRIVATE KEY-----
 </key>
-
 <tls-auth>
 -----BEGIN OpenVPN Static key V1-----
 ...
 -----END OpenVPN Static key V1-----
-</tls-auth>
-`
+</tls-auth>`
+
 ##RSpec testing
 
 due to the rspec can not run the container with --cap-add=NET_ADMIN or --priviledged, and it echo the container is not running, due to docker finished openvpn-start.sh and closed, if you want to the static analysis for openvpn docker you need to change `exec openvpn $*` to other command e.g. `tail -f /var/log`
