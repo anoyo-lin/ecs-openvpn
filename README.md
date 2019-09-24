@@ -58,7 +58,9 @@ docker run -p 35000:443/tcp -it --entrypoint=sh --cap-add=NET_ADMIN aws/openvpn:
 on debug console prompt
 
 ## aws ecs fargate configuration
-`{
+
+```
+{
     "ipcMode": null,
     "executionRoleArn": "arn:aws:iam:: account_id:role/ecsTaskExecutionRole",
     "containerDefinitions": [
@@ -149,12 +151,14 @@ on debug console prompt
     "proxyConfiguration": null,
     "volumes": [],
     "tags": []
-}`
+}
+```
 it need to assign the S3FullAccess policy to ecsTaskExecutionRole.
 
 ##openvpn profile template for client
 
-`client
+```
+client
 proto tcp
 remote hostname
 port 35000
@@ -183,7 +187,8 @@ comp-lzo
 -----BEGIN OpenVPN Static key V1-----
 ...
 -----END OpenVPN Static key V1-----
-</tls-auth>`
+</tls-auth>
+```
 
 ##RSpec testing
 
