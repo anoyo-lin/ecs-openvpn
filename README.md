@@ -220,7 +220,7 @@ export KEY_COUNTRY="CN"
 export KEY_PROVINCE="TJ"
 export KEY_CITY="Tianjin"
 export KEY_ORG="gene's secret garden"
-export KEY_EMAIL="anoyo_lin@qq.com"
+export KEY_EMAIL="mail@domain.com"
 export KEY_OU="God Hand"
 
 source ./vars
