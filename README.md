@@ -154,6 +154,7 @@ on debug console prompt
 }
 ```
 it need to assign the S3FullAccess policy to ecsTaskExecutionRole.
+and aws ecs fargate cannot using --cap-add/--cap-drop, and --priviledge, so we decide using this docker in native build ec2 instance.
 
 ## openvpn profile template for client
 
@@ -164,9 +165,11 @@ remote hostname
 port 35000
 dev tun
 nobind
+#it will show the HMAC invalid error message from openvpn server
 cipher AES-128-CBC
 auth SHA256
 key-direction 1
+#it needs compression lzo header keep same both in server and client
 comp-lzo
 <ca>
 -----BEGIN CERTIFICATE-----
